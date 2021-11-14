@@ -36,7 +36,7 @@ export default class TwitterStream {
   private _state: State;
   private _events: Array<DeferredPromise<any>>;
   private _timeout?: ReturnType<typeof setTimeout>;
-  private _wait: number;
+  private _wait: number = 0;
 
   constructor(
     connect: () => Promise<any>,
@@ -51,6 +51,7 @@ export default class TwitterStream {
     this._state = State.NOT_STARTED;
     this._events = [new DeferredPromise()];
     this._wait = timeout * 1000;
+    // this._wait = options.timeout ? options.timeout * 1000 : 0;
   }
 
   _emit(promise) {
@@ -99,7 +100,7 @@ export default class TwitterStream {
           this._state = State.STARTED;
 
           const response = await this._connect();
-          const stream = response.body.pipe(split());
+          const stream = response.data.pipe(split());
 
           this._refreshTimeout();
 

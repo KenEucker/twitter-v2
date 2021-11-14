@@ -8,7 +8,7 @@
     "build": "tsc --project .",
     "lint": "prettier . --check",
     "lint:fix": "prettier . --write",
-    "test": "ts-mocha --ui bdd --recursive"
+    "test": "ts-mocha --ui bdd --recursive --timeout=5000"
   },
   "pre-commit": {
     "run": "lint"
@@ -21,6 +21,7 @@
     "twitter",
     "v2",
     "node",
+    "browser",
     "api",
     "stream",
     "streaming",
@@ -44,6 +45,7 @@
     "@types/node": "14.14.37",
     "chai": "4.3.0",
     "chalk": "4.1.0",
+    "dotenv": "^10.0.0",
     "enquirer": "2.3.6",
     "minimist": "1.2.5",
     "mocha": "8.3.0",
@@ -54,7 +56,7 @@
   },
   "dependencies": {
     "abort-controller": "3.0.0",
-    "node-fetch": "2.6.1",
+    "axios": "^0.24.0",
     "oauth-1.0a": "2.2.6",
     "split": "1.0.1"
   }
