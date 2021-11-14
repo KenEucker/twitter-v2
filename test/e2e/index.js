@@ -1,4 +1,7 @@
 import chalk from 'chalk';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 if (process.env.TWITTER_DISABLE_E2E) {
   console.warn(chalk.yellow('e2e tests are disabled'));

@@ -1,6 +1,6 @@
 import OAuth from 'oauth-1.0a';
 import crypto from 'crypto';
-import fetch from 'node-fetch';
+import axios from 'axios';
 import { URL } from 'url';
 
 import TwitterError from './TwitterError';
@@ -157,7 +157,7 @@ function validate(credentials: CredentialsArgs) {
 }
 
 async function createBearerToken({ consumer_key, consumer_secret }) {
-  const response = await fetch('https://api.twitter.com/oauth2/token', {
+  const { data } = await axios('https://api.twitter.com/oauth2/token', {
     method: 'post',
     headers: {
       Authorization:
@@ -165,29 +165,27 @@ async function createBearerToken({ consumer_key, consumer_secret }) {
         Buffer.from(`${consumer_key}:${consumer_secret}`).toString('base64'),
       'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
     },
-    body: 'grant_type=client_credentials',
+    data: 'grant_type=client_credentials',
   });
 
-  const body = await response.json();
-
-  if (body.errors) {
-    const error = body.errors[0];
+  if (data.errors) {
+    const error = data.errors[0];
     throw new TwitterError(
-      `${body.title}: ${error.message}`,
-      body.type,
-      body.detail
+      `${data.title}: ${error.message}`,
+      data.type,
+      data.detail
     );
   }
 
-  if (body.token_type != 'bearer') {
+  if (data.token_type != 'bearer') {
     throw new TwitterError(
       'Unexpected reply from Twitter upon obtaining bearer token',
       undefined,
-      `Expected "bearer" but found ${body.token_type}`
+      `Expected "bearer" but found ${data.token_type}`
     );
   }
 
-  return body.access_token;
+  return data.access_token;
 }
 
 export default class Credentials {

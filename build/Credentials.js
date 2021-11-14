@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const oauth_1_0a_1 = __importDefault(require("oauth-1.0a"));
 const crypto_1 = __importDefault(require("crypto"));
-const node_fetch_1 = __importDefault(require("node-fetch"));
+const axios_1 = __importDefault(require("axios"));
 const TwitterError_1 = __importDefault(require("./TwitterError"));
 function removeNullAndUndefined(obj) {
     Object.keys(obj).forEach((key) => obj[key] == null && delete obj[key]);
@@ -69,24 +69,23 @@ function validate(credentials) {
     }
 }
 async function createBearerToken({ consumer_key, consumer_secret }) {
-    const response = await node_fetch_1.default('https://api.twitter.com/oauth2/token', {
+    const { data } = await axios_1.default('https://api.twitter.com/oauth2/token', {
         method: 'post',
         headers: {
             Authorization: 'Basic ' +
                 Buffer.from(`${consumer_key}:${consumer_secret}`).toString('base64'),
             'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
         },
-        body: 'grant_type=client_credentials',
+        data: 'grant_type=client_credentials',
     });
-    const body = await response.json();
-    if (body.errors) {
-        const error = body.errors[0];
-        throw new TwitterError_1.default(`${body.title}: ${error.message}`, body.type, body.detail);
+    if (data.errors) {
+        const error = data.errors[0];
+        throw new TwitterError_1.default(`${data.title}: ${error.message}`, data.type, data.detail);
     }
-    if (body.token_type != 'bearer') {
-        throw new TwitterError_1.default('Unexpected reply from Twitter upon obtaining bearer token', undefined, `Expected "bearer" but found ${body.token_type}`);
+    if (data.token_type != 'bearer') {
+        throw new TwitterError_1.default('Unexpected reply from Twitter upon obtaining bearer token', undefined, `Expected "bearer" but found ${data.token_type}`);
     }
-    return body.access_token;
+    return data.access_token;
 }
 class Credentials {
     constructor(args) {
